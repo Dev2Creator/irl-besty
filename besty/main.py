@@ -133,7 +133,7 @@ def run_interactive():
         else:
             target_input = Prompt.ask("[bold info]Stego-Emoji to Decode[/]")
             
-    password = Prompt.ask("[bold info]Encryption Key[/]", password=True)
+    password = Prompt.ask("[bold info]Encryption Key[/] [border](Press Enter to skip)[/]", password=True, default="")
     
     cover_emoji = "😈"
     if base_action == "encode":
@@ -208,7 +208,7 @@ def main():
     parser = argparse.ArgumentParser(description="Besty Zero-Width Engine")
     parser.add_argument("action", choices=["encode", "decode"], help="Action to perform")
     parser.add_argument("file", help="Target file path")
-    parser.add_argument("--password", "-p", required=True, help="Encryption key")
+    parser.add_argument("--password", "-p", default="", help="Encryption key (optional)")
     parser.add_argument("--emoji", "-e", default="😈", help="Cover emoji (for encoding)")
     
     args = parser.parse_args()

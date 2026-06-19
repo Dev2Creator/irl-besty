@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="irl-besty",
-    version="1.0.0",
+    version="2.0.0",
     description="An unhinged text-to-emoji cipher engine.",
     author="Anika Mukherjee - irl Professor Bones Team",
     packages=find_packages(),

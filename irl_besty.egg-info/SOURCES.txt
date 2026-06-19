@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+besty/__init__.py
+besty/main.py
+irl_besty.egg-info/PKG-INFO
+irl_besty.egg-info/SOURCES.txt
+irl_besty.egg-info/dependency_links.txt
+irl_besty.egg-info/entry_points.txt
+irl_besty.egg-info/requires.txt
+irl_besty.egg-info/top_level.txt

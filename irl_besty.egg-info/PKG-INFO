@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: irl-besty
+Version: 1.0.0
+Summary: An unhinged text-to-emoji cipher engine.
+Author: Anika Mukherjee - irl Professor Bones Team
+License-File: LICENSE
+Requires-Dist: rich>=13.0.0
+Dynamic: author
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary

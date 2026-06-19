@@ -11,12 +11,14 @@ try:
     from rich.text import Text
     from rich.theme import Theme
     from rich.table import Table
-    # Setup UiPro aesthetic theme
+    # Setup UiPro Pro Max aesthetic theme (OLED Dark Mode)
     uipro_theme = Theme({
-        "info": "#F8FAFC",
-        "accent": "#22C55E",
-        "border": "#334155",
-        "danger": "#EF4444"
+        "primary": "#F8FAFC",         # Pure text
+        "secondary": "#1E293B",       # Borders, structural elements
+        "accent": "bold #22C55E",     # Success / CTA Green
+        "bg": "on #020617",           # Deep OLED Black
+        "dim": "#475569",             # Muted text
+        "danger": "bold #EF4444"      # Errors
     })
     console = Console(theme=uipro_theme)
 except ImportError:
@@ -105,41 +107,41 @@ def display_emoji_grid():
         formatted_row = []
         for emoji in row:
             idx = COVER_EMOJIS.index(emoji) + 1
-            formatted_row.append(f"[border][{idx:02d}][/] {emoji}")
+            formatted_row.append(f"[dim][{idx:02d}][/] {emoji}")
         table.add_row(*formatted_row)
         
-    console.print(Panel(table, title="[bold border]COVER EMOJI SELECTOR[/]", border_style="border"))
+    console.print(Panel(table, title="[primary bg] COVER EMOJI SELECTOR [/]", border_style="secondary", style="bg"))
 
 def run_interactive():
-    header = Text("BESTY ZERO-WIDTH ENGINE", justify="center", style="bold info")
-    panel = Panel(header, border_style="border", padding=(1, 4), title="[bold border]Steganography Module[/]", subtitle="[bold border]v2.0.2[/]")
+    header = Text("BESTY ZERO-WIDTH ENGINE", justify="center", style="primary")
+    panel = Panel(header, border_style="secondary", style="bg", padding=(1, 4), title="[primary bg] Steganography Module [/]", subtitle="[primary bg] v2.0.4 [/]")
     console.print(panel)
     console.print()
     
-    action = Prompt.ask("[bold info]Select Protocol[/] [border](encode/decode/text-encode/text-decode)[/]", choices=["encode", "decode", "text-encode", "text-decode"])
+    action = Prompt.ask("[primary]Select Protocol[/] [dim](encode/decode/text-encode/text-decode)[/]", choices=["encode", "decode", "text-encode", "text-decode"], console=console)
     
     is_text = action.startswith("text-")
     base_action = action.replace("text-", "")
     
     if not is_text:
-        target_input = Prompt.ask("[bold info]Target File Path[/]")
+        target_input = Prompt.ask("[primary]Target File Path[/]", console=console)
         if not os.path.exists(target_input):
-            console.print(f"\n[bold danger][ERR] File '{target_input}' not found in filesystem.[/bold danger]")
-            console.print("[info]Tip: If you want to encode plain text instead of a file, choose 'text-encode' as the protocol.[/info]")
+            console.print(f"\n[danger][ERR] File '{target_input}' not found in filesystem.[/danger]")
+            console.print("[dim]Tip: If you want to encode plain text instead of a file, choose 'text-encode' as the protocol.[/dim]")
             sys.exit(1)
     else:
         if base_action == "encode":
-            target_input = Prompt.ask("[bold info]Secret Text to Encode[/]")
+            target_input = Prompt.ask("[primary]Secret Text to Encode[/]", console=console)
         else:
-            target_input = Prompt.ask("[bold info]Stego-Emoji to Decode[/]")
+            target_input = Prompt.ask("[primary]Stego-Emoji to Decode[/]", console=console)
             
-    password = Prompt.ask("[bold info]Encryption Key[/] [border](Press Enter to skip)[/]", password=True, default="")
+    password = Prompt.ask("[primary]Encryption Key[/] [dim](Press Enter to skip)[/]", password=True, default="", console=console)
     
     cover_emoji = "😈"
     if base_action == "encode":
         console.print()
         display_emoji_grid()
-        choice = Prompt.ask("[bold info]Select Cover Emoji ID[/] [border](1-24)[/]", default="1")
+        choice = Prompt.ask("[primary]Select Cover Emoji ID[/] [dim](1-24)[/]", default="1", console=console)
         try:
             idx = int(choice) - 1
             if 0 <= idx < len(COVER_EMOJIS):
@@ -148,20 +150,20 @@ def run_interactive():
             pass
     
     if not is_text:
-        console.print(f"\n[border]>[/] [info]Initializing {base_action.upper()} protocol on file...[/]")
+        console.print(f"\n[secondary]>[/] [primary]Initializing {base_action.upper()} protocol on file...[/]")
         process_file(base_action, target_input, password, cover_emoji)
     else:
-        console.print(f"\n[border]>[/] [info]Initializing TEXT-{base_action.upper()} protocol...[/]")
+        console.print(f"\n[secondary]>[/] [primary]Initializing TEXT-{base_action.upper()} protocol...[/]")
         process_text(base_action, target_input, password, cover_emoji)
 
 def process_text(action, text_input, password, cover_emoji="😈"):
     if action == "encode":
         result = encode(text_input, password, cover_emoji)
-        console.print(Panel(result, title="[bold accent]STEGO-EMOJI RESULT (COPY THIS)[/]", border_style="accent"))
-        console.print("[info]The text above looks like a normal emoji, but your encrypted data is hidden inside it using zero-width characters![/info]")
+        console.print(Panel(result, title="[accent bg] STEGO-EMOJI RESULT (COPY THIS) [/]", border_style="accent", style="bg"))
+        console.print("[dim]The text above looks like a normal emoji, but your encrypted data is hidden inside it using zero-width characters![/dim]")
     elif action == "decode":
         result = decode(text_input, password)
-        console.print(Panel(result, title="[bold accent]DECODED SECRET MESSAGE[/]", border_style="accent"))
+        console.print(Panel(result, title="[accent bg] DECODED SECRET MESSAGE [/]", border_style="accent", style="bg"))
 
 def process_file(action, file_path, password, cover_emoji="😈"):
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -174,8 +176,8 @@ def process_file(action, file_path, password, cover_emoji="😈"):
         with open(out_file, 'w', encoding='utf-8') as f:
             f.write(result)
         
-        success_msg = Text(f"BOUND TO: {cover_emoji} -> {out_file}", style="bold accent")
-        console.print(Panel(success_msg, border_style="border", title="[bold border]STATUS: SUCCESS[/]"))
+        success_msg = Text(f"BOUND TO: {cover_emoji} -> {out_file}", style="accent bg")
+        console.print(Panel(success_msg, border_style="secondary", style="bg", title="[secondary bg] STATUS: SUCCESS [/]"))
         
     elif action == "decode":
         result = decode(content, password)
@@ -188,11 +190,11 @@ def process_file(action, file_path, password, cover_emoji="😈"):
         with open(out_file, 'w', encoding='utf-8') as f:
             f.write(result)
             
-        success_msg = Text(f"EXTRACTED: {out_file}", style="bold accent")
+        success_msg = Text(f"EXTRACTED: {out_file}", style="accent bg")
         preview = result[:200] + ("..." if len(result) > 200 else "")
         
-        console.print(Panel(success_msg, border_style="border", title="[bold border]STATUS: SUCCESS[/]"))
-        console.print(f"\n[border]--- DECODED PREVIEW ---[/]\n[info]{preview}[/]")
+        console.print(Panel(success_msg, border_style="secondary", style="bg", title="[secondary bg] STATUS: SUCCESS [/]"))
+        console.print(f"\n[secondary]--- DECODED PREVIEW ---[/]\n[primary]{preview}[/]")
 
 def main():
     if len(sys.argv) == 1:
@@ -200,9 +202,9 @@ def main():
         return
 
     if len(sys.argv) == 2 and sys.argv[1] == "update":
-        console.print("\n[bold accent]>[/] [info]Fetching latest Zero-Width Steganography updates from PyPI...[/]")
+        console.print("\n[accent]>[/] [primary]Fetching latest Zero-Width Steganography updates from PyPI...[/]")
         os.system(f"{sys.executable} -m pip install --upgrade irl-besty")
-        console.print("[bold accent]Update complete. You are now running the latest engine.[/]\n")
+        console.print("[accent]Update complete. You are now running the latest engine.[/]\n")
         return
 
     parser = argparse.ArgumentParser(description="Besty Zero-Width Engine")
@@ -221,3 +223,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

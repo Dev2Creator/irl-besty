@@ -112,21 +112,31 @@ def display_emoji_grid():
 
 def run_interactive():
     header = Text("BESTY ZERO-WIDTH ENGINE", justify="center", style="bold info")
-    panel = Panel(header, border_style="border", padding=(1, 4), title="[bold border]Steganography Module[/]", subtitle="[bold border]v2.0.0[/]")
+    panel = Panel(header, border_style="border", padding=(1, 4), title="[bold border]Steganography Module[/]", subtitle="[bold border]v2.0.2[/]")
     console.print(panel)
     console.print()
     
-    action = Prompt.ask("[bold info]Select Protocol[/] [border](encode/decode)[/]", choices=["encode", "decode"])
+    action = Prompt.ask("[bold info]Select Protocol[/] [border](encode/decode/text-encode/text-decode)[/]", choices=["encode", "decode", "text-encode", "text-decode"])
     
-    file_path = Prompt.ask(f"[bold info]Target File Path[/]")
-    if not os.path.exists(file_path):
-        console.print(f"\n[bold danger][ERR] File '{file_path}' not found in filesystem.[/bold danger]")
-        sys.exit(1)
-        
+    is_text = action.startswith("text-")
+    base_action = action.replace("text-", "")
+    
+    if not is_text:
+        target_input = Prompt.ask("[bold info]Target File Path[/]")
+        if not os.path.exists(target_input):
+            console.print(f"\n[bold danger][ERR] File '{target_input}' not found in filesystem.[/bold danger]")
+            console.print("[info]Tip: If you want to encode plain text instead of a file, choose 'text-encode' as the protocol.[/info]")
+            sys.exit(1)
+    else:
+        if base_action == "encode":
+            target_input = Prompt.ask("[bold info]Secret Text to Encode[/]")
+        else:
+            target_input = Prompt.ask("[bold info]Stego-Emoji to Decode[/]")
+            
     password = Prompt.ask("[bold info]Encryption Key[/]", password=True)
     
     cover_emoji = "😈"
-    if action == "encode":
+    if base_action == "encode":
         console.print()
         display_emoji_grid()
         choice = Prompt.ask("[bold info]Select Cover Emoji ID[/] [border](1-24)[/]", default="1")
@@ -137,8 +147,21 @@ def run_interactive():
         except ValueError:
             pass
     
-    console.print(f"\n[border]>[/] [info]Initializing {action.upper()} protocol on {file_path}...[/]")
-    process_file(action, file_path, password, cover_emoji)
+    if not is_text:
+        console.print(f"\n[border]>[/] [info]Initializing {base_action.upper()} protocol on file...[/]")
+        process_file(base_action, target_input, password, cover_emoji)
+    else:
+        console.print(f"\n[border]>[/] [info]Initializing TEXT-{base_action.upper()} protocol...[/]")
+        process_text(base_action, target_input, password, cover_emoji)
+
+def process_text(action, text_input, password, cover_emoji="😈"):
+    if action == "encode":
+        result = encode(text_input, password, cover_emoji)
+        console.print(Panel(result, title="[bold accent]STEGO-EMOJI RESULT (COPY THIS)[/]", border_style="accent"))
+        console.print("[info]The text above looks like a normal emoji, but your encrypted data is hidden inside it using zero-width characters![/info]")
+    elif action == "decode":
+        result = decode(text_input, password)
+        console.print(Panel(result, title="[bold accent]DECODED SECRET MESSAGE[/]", border_style="accent"))
 
 def process_file(action, file_path, password, cover_emoji="😈"):
     with open(file_path, 'r', encoding='utf-8') as f:

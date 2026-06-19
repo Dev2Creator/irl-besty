@@ -176,6 +176,12 @@ def main():
         run_interactive()
         return
 
+    if len(sys.argv) == 2 and sys.argv[1] == "update":
+        console.print("\n[bold accent]>[/] [info]Fetching latest Zero-Width Steganography updates from PyPI...[/]")
+        os.system(f"{sys.executable} -m pip install --upgrade irl-besty")
+        console.print("[bold accent]Update complete. You are now running the latest engine.[/]\n")
+        return
+
     parser = argparse.ArgumentParser(description="Besty Zero-Width Engine")
     parser.add_argument("action", choices=["encode", "decode"], help="Action to perform")
     parser.add_argument("file", help="Target file path")
